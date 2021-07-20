@@ -1,0 +1,7 @@
+apiVersion: drumwave.ia/v1alpha1
+kind: DwEngine
+metadata:
+  name: example-dwengine
+spec:
+  # Add fields here
+  size: 3
