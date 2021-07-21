@@ -1,2 +1,27 @@
 ---
 # tasks file for dwengine
+- name: start mogodb
+  k8s:
+    definition:
+      kind: Deployment
+      apiVersion: apps/v1
+      metadata:
+        name: '{{ meta.name }}-mogodb'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        replicas: "1"
+        selector:
+          matchLabels:
+            app: mongod
+        template:
+          metadata:
+            labels:
+              app: mongod
+          spec:
+            containers:
+            - name: mongod
+              command:
+              - mongod
+              image: "docker.io/mongo:3.6-xenial"
+              ports:
+                - containerPort: 27017
