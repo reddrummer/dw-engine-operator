@@ -1,0 +1,111 @@
+---
+- name: start gateway deployment
+  k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: '{{ meta.name }}-gateway'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        selector:
+          matchLabels:
+            app: '{{ meta.name }}-gateway'
+        template:
+          metadata:
+            labels:
+              app: '{{ meta.name }}-gateway'
+          spec:
+            imagePullSecrets: 
+            - name: dw-engine-image-pull-secret
+            containers:
+            - name: gateway
+              image: '{{ gateway_image }}'
+              resources:
+                limits:
+                  memory: '{{ gateway_mem_limit }}'
+                  cpu: '{{ gateway_cpu_limit }}'
+              ports:
+              - name: http
+                containerPort: 8080
+              env:
+                - name: SERVER_PORT
+                  value: "8080"
+                - name: AMQP_URL
+                  valueFrom: 
+                    secretKeyRef:
+                      name: '{{ meta.name }}-rabbitmq-secret'
+                      key: url
+                - name: CERTIFICATE_EXCHANGE
+                  value: certificate-exchange
+                - name: CERTIFICATE_QUEUE
+                  value: certificate-queue
+                - name: COG_EXCHANGE
+                  value: cog-exchange
+                - name: COG_QUEUE
+                  value: cog-queue
+                - name: DEAD_LETTER_EXCHANGE
+                  value: dl-certificate-exchange
+                - name: DEAD_LETTER_QUEUE
+                  value: dl-certificate-queue
+                - name: QUEUE_RETRY_QTY
+                  value: "3"
+                - name: CERT_DB_USER
+                  valueFrom: 
+                    secretKeyRef:
+                      name: '{{ meta.name }}-mongodb-configuration'
+                      key: username
+                - name: CERT_DB_PASSWORD
+                  valueFrom: 
+                    secretKeyRef:
+                      name: '{{ meta.name }}-mongodb-configuration'
+                      key: password
+                - name: CERT_DB_HOST
+                  valueFrom: 
+                    secretKeyRef:
+                      name: '{{ meta.name }}-mongodb-configuration'
+                      key: host
+                - name: CERT_DB_PORT
+                  value: "27017"
+                - name: CERT_DB_DATABASE
+                  valueFrom: 
+                    secretKeyRef:
+                      name: '{{ meta.name }}-mongodb-configuration'
+                      key: database
+
+- name: start gateway service
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: '{{ meta.name }}-gateway'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        selector:
+          app: '{{ meta.name }}-gateway'
+        ports:
+          - name: http
+            port: 8080
+            targetPort: 8080
+            protocol: TCP
+
+- name: start gateway route
+  k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        name: '{{ meta.name }}-gateway'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        port:
+          targetPort: http
+        tls:
+          insecureEdgeTerminationPolicy: Redirect
+          termination: edge
+        to:
+          kind: Service
+          name: '{{ meta.name }}-gateway'
+          weight: 100
+        wildcardPolicy: None
