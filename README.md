@@ -103,3 +103,49 @@ $ oc get route
 NAME                       HOST/PORT                                                                                                                    PATH   SERVICES                   PORT   TERMINATION     WILDCARD
 example-dwengine-gateway   example-dwengine-gateway-dw-engine-tests.<openshift domain>          example-dwengine-gateway   http   edge/Redirect   None
 ```
+
+### Advanced configuration
+
+Extra parameters can be passed on Dw Engine Custom Resource spec in order for overwrite default values, e.g.
+
+```yaml
+apiVersion: drumwave.ia/v1alpha1
+kind: DwEngine
+metadata:
+  name: <custom resource name>
+  namespace: <dwengine-project>
+spec:
+  database_mem_limit: '512Mi'
+```
+
+The list below shows all extra parametes and its default value
+
+```yaml
+database_image: mongo:3.6-xenial
+database_username: dw
+database_name: certificate
+database_pvc_size: '10Gi'
+database_mem_limit: '256Mi'
+database_cpu_limit: '500m'
+
+mq_username: dw
+mq_image: rabbitmq:3.8.16-management
+mq_pvc_size: '10Gi'
+mq_mem_limit: '512Mi'
+mq_cpu_limit: '500m'
+
+wkc_manager_image: quay.io/drumwave/cog-wkc-manager:1.0.0
+wkc_manager_mem_limit: '512Mi'
+wkc_manager_cpu_limit: '500m'
+cp4d_url: ''
+cp4d_user: ''
+cp4d_password: ''
+
+certificate_manager_image: quay.io/drumwave/lichen-certificate-manager:1.0.0
+certificate_manager_mem_limit: '512Mi'
+certificate_manager_cpu_limit: '500m'
+
+gateway_image: quay.io/drumwave/lichen-engine-gateway:1.0.0
+gateway_mem_limit: '512Mi'
+gateway_cpu_limit: '500m'
+```
