@@ -106,7 +106,7 @@ example-dwengine-gateway   example-dwengine-gateway-dw-engine-tests.<openshift d
 
 ### Advanced configuration
 
-Extra parameters can be passed on Dw Engine Custom Resource spec in order for overwrite default values, e.g.
+In order for overwrite default values, extra parameters can be passed on Dw Engine Custom Resource spec, e.g.
 
 ```yaml
 apiVersion: drumwave.ia/v1alpha1
