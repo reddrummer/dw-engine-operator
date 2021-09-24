@@ -140,6 +140,7 @@ wkc_manager_cpu_limit: '500m'
 cp4d_url: ''
 cp4d_user: ''
 cp4d_password: ''
+cp4d_api_key: ''
 
 certificate_manager_image: quay.io/drumwave/lichen-certificate-manager:1.0.0
 certificate_manager_mem_limit: '512Mi'

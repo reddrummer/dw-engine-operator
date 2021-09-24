@@ -67,3 +67,5 @@
                   value: '{{ cp4d_user }}'
                 - name: CP4D_PASSWORD
                   value: '{{ cp4d_password }}'
+                - name: CP4D_API_KEY
+                  value: '{{ cp4d_api_key }}'
