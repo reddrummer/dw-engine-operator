@@ -19,7 +19,7 @@ spec:
       containers:
         - name: dw-engine-operator
           # Replace this with the built image name
-          image: "quay.io/drumwave/dw-engine-operator:1.0.0"
+          image: "quay.io/drumwave/dw-engine-operator:v1.0.0-operator"
           imagePullPolicy: "Always"
           volumeMounts:
           - mountPath: /tmp/ansible-operator/runner

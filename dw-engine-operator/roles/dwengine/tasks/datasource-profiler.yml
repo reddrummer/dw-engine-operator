@@ -1,40 +1,31 @@
 ---
-- name: start gateway deployment
+- name: start datasource-profiler deployment
   k8s:
     definition:
       apiVersion: apps/v1
       kind: Deployment
       metadata:
-        name: '{{ meta.name }}-gateway'
+        name: '{{ meta.name }}-datasource-profiler'
         namespace: '{{ meta.namespace }}'
       spec:
         selector:
           matchLabels:
-            app: '{{ meta.name }}-gateway'
+            app: '{{ meta.name }}-datasource-profiler'
         template:
           metadata:
             labels:
-              app: '{{ meta.name }}-gateway'
+              app: '{{ meta.name }}-datasource-profiler'
           spec:
             imagePullSecrets: 
             - name: dw-engine-image-pull-secret
             containers:
-            - name: gateway
-              image: '{{ gateway_image }}'
+            - name: 'datasource-profiler'
+              image: '{{ datasource_profiler_image }}'
               resources:
                 limits:
-                  memory: '{{ gateway_mem_limit }}'
-                  cpu: '{{ gateway_cpu_limit }}'
-              ports:
-              - name: http
-                containerPort: 8080
+                  memory: '{{ datasource_profiler_mem_limit }}'
+                  cpu: '{{ datasource_profiler_cpu_limit }}'
               env:
-                - name: SERVER_PORT
-                  value: "8080"
-                - name: ACCOUNTS_API
-                  value: '{{ accounts_api }}'
-                - name: ENV
-                  value: local
                 - name: MESSAGES_PORT
                   value: "5672"
                 - name: MESSAGES_HOST
@@ -92,40 +83,7 @@
                   value: "27017"
                 - name: REPORTS_DB
                   value: reports
-
-- name: start gateway service
-  k8s:
-    definition:
-      apiVersion: v1
-      kind: Service
-      metadata:
-        name: '{{ meta.name }}-gateway'
-        namespace: '{{ meta.namespace }}'
-      spec:
-        selector:
-          app: '{{ meta.name }}-gateway'
-        ports:
-          - name: http
-            port: 8080
-            targetPort: 8080
-            protocol: TCP
-
-- name: start gateway route
-  k8s:
-    definition:
-      apiVersion: route.openshift.io/v1
-      kind: Route
-      metadata:
-        name: '{{ meta.name }}-gateway'
-        namespace: '{{ meta.namespace }}'
-      spec:
-        port:
-          targetPort: http
-        tls:
-          insecureEdgeTerminationPolicy: Redirect
-          termination: edge
-        to:
-          kind: Service
-          name: '{{ meta.name }}-gateway'
-          weight: 100
-        wildcardPolicy: None
+                - name: CP4D_URL
+                  value: '{{ cp4d_url }}'
+                - name: CP4D_API_KEY
+                  value: '{{ cp4d_api_key }}'

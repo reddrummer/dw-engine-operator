@@ -1,0 +1,76 @@
+---
+- name: create fuseki pvc
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata: 
+        name: '{{ meta.name }}-fuseki'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        volumeMode: Filesystem
+        resources:
+          requests:
+            storage: '{{ fuseki_pvc_size }}'
+
+- name: start fuseki statefulset
+  k8s:
+    definition:
+      kind: StatefulSet
+      apiVersion: apps/v1
+      metadata:
+        name: '{{ meta.name }}-fuseki'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        serviceName: fuseki
+        selector:
+          matchLabels:
+            app: '{{ meta.name }}-fuseki'
+        template:
+          metadata:
+            labels:
+              app: '{{ meta.name }}-fuseki'
+          spec:
+            imagePullSecrets: 
+            - name: dw-engine-image-pull-secret
+            containers:
+            - name: fuseki
+              image: '{{ fuseki_image }}'
+              resources:
+                limits:
+                  memory: '{{ fuseki_mem_limit }}'
+                  cpu: '{{ fuseki_cpu_limit }}'
+              ports:
+              - name: fuseki
+                containerPort: 3030
+              volumeMounts:
+                - mountPath: /fuseki/databases
+                  name: fusekidata
+              args:
+                - --mem
+                # - --update 
+                # - --loc
+                # - databases/DB2
+                - /ds
+            volumes:
+            - name: fusekidata
+              persistentVolumeClaim:
+                claimName: '{{ meta.name }}-fuseki'
+- name: start fuseki service
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: '{{ meta.name }}-fuseki'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        selector:
+          app: '{{ meta.name }}-fuseki'
+        ports:
+          - name: fuseki
+            port: 3030
+            targetPort: 3030
+            protocol: TCP

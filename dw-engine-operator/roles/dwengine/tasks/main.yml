@@ -3,14 +3,17 @@
 - name: Include mongodb deployment
   include_tasks: mongodb.yml
 
+- name: Include fuseki deployment
+  include_tasks: fuseki.yml
+
 - name: Include rabbitmq deployment
   include_tasks: rabbitmq.yml
 
 - name: Include wkc manager deployment
-  include_tasks: wkc-manager.yml
+  include_tasks: ontology-manager.yml
 
 - name: Include certificate manager deployment
-  include_tasks: certificate-manager.yml
+  include_tasks: datasource-profiler.yml
 
 - name: Include gateway deployment
   include_tasks: gateway.yml
