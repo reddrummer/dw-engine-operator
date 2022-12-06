@@ -88,13 +88,14 @@ oc create -f <manifest>.yaml
 ***7.*** Verify if all pods are up and running
 ```shell
 $ oc get pods
-NAME                                                   READY   STATUS    RESTARTS   AGE
-dw-engine-operator-6cddc8975b-8gcl4                    1/1     Running   0          12m
-example-dwengine-certificate-manager-f669b6557-wv4dr   1/1     Running   0          107s
-example-dwengine-gateway-5594b8444-897hw               1/1     Running   0          29m
-example-dwengine-mongodb-0                             1/1     Running   0          30m
-example-dwengine-rabbitmq-0                            1/1     Running   0          29m
-example-dwengine-wkc-manager-75b55b869f-kpvp5          1/1     Running   0          29m
+NAME                                           READY   STATUS    RESTARTS   AGE
+dw-engine-operator-6cddc8975b-8gcl4            1/1     Running   0          12m
+example-datasource-profiler-5497867f7d-zgjcf   1/1     Running   0          2m49s
+example-fuseki-0                               1/1     Running   0          3m7s
+example-gateway-5b94d55d76-jl82c               1/1     Running   0          2m47s
+example-mongodb-0                              1/1     Running   0          3m10s
+example-ontology-manager-75cdd48496-qc8bw      1/1     Running   0          2m51s
+example-rabbitmq-0                             1/1     Running   0          2m58s
 ```
 
 ***8.*** Get gateway's route url
@@ -123,10 +124,15 @@ The list below shows all extra parametes and its default value
 ```yaml
 database_image: mongo:3.6-xenial
 database_username: dw
-database_name: certificate
+database_name: admin
 database_pvc_size: '10Gi'
 database_mem_limit: '256Mi'
 database_cpu_limit: '500m'
+
+fuseki_image: quay.io/drumwave/lichen-domain-ontology:v1.0.0-operator
+fuseki_pvc_size: '10Gi'
+fuseki_mem_limit: '256Mi'
+fuseki_cpu_limit: '500m'
 
 mq_username: dw
 mq_image: rabbitmq:3.8.16-management
@@ -134,19 +140,21 @@ mq_pvc_size: '10Gi'
 mq_mem_limit: '512Mi'
 mq_cpu_limit: '500m'
 
-wkc_manager_image: quay.io/drumwave/cog-wkc-manager:1.0.0
-wkc_manager_mem_limit: '512Mi'
-wkc_manager_cpu_limit: '500m'
+datasource_profiler_image: quay.io/drumwave/dw-engine-datasource-profiler:v1.0.0-operator
+datasource_profiler_mem_limit: '512Mi'
+datasource_profiler_cpu_limit: '500m'
 cp4d_url: ''
 cp4d_user: ''
 cp4d_password: ''
 cp4d_api_key: ''
 
-certificate_manager_image: quay.io/drumwave/lichen-certificate-manager:1.0.0
-certificate_manager_mem_limit: '512Mi'
-certificate_manager_cpu_limit: '500m'
+ontology_manager_image: quay.io/drumwave/dw-engine-ontology-manager:v1.0.0-operator
+ontology_manager_mem_limit: '512Mi'
+ontology_manager_cpu_limit: '500m'
 
-gateway_image: quay.io/drumwave/lichen-engine-gateway:1.0.0
+gateway_image: quay.io/drumwave/lichen-engine-gateway:v1.0.0-operator
 gateway_mem_limit: '512Mi'
 gateway_cpu_limit: '500m'
+
+accounts_api: 'https://accounts.lichen.com/v1'
 ```
